@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>AuthController.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#191a1c">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+AuthController.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">taskremainder</span><span class="s2">.</span><span class="s1">controller</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">taskremainder</span><span class="s2">.</span><span class="s1">entity</span><span class="s2">.</span><span class="s1">User</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">taskremainder</span><span class="s2">.</span><span class="s1">service</span><span class="s2">.</span><span class="s1">UserService</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">jakarta</span><span class="s2">.</span><span class="s1">servlet</span><span class="s2">.</span><span class="s1">http</span><span class="s2">.</span><span class="s1">HttpSession</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">stereotype</span><span class="s2">.</span><span class="s1">Controller</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">ui</span><span class="s2">.</span><span class="s1">Model</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">web</span><span class="s2">.</span><span class="s1">bind</span><span class="s2">.</span><span class="s1">annotation</span><span class="s2">.*;</span>
+
+<span class="s1">@Controller</span>
+<span class="s0">public class </span><span class="s1">AuthController </span><span class="s2">{</span>
+
+    <span class="s0">private final </span><span class="s1">UserService userService</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">AuthController</span><span class="s2">(</span><span class="s1">UserService userService</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">userService </span><span class="s2">= </span><span class="s1">userService</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s3">//registration page</span>
+    <span class="s1">@GetMapping</span><span class="s2">(</span><span class="s4">&quot;/register&quot;</span><span class="s2">)</span>
+    <span class="s0">public </span><span class="s1">String registerPage</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s4">&quot;register&quot;</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s3">//register</span>
+    <span class="s1">@PostMapping</span><span class="s2">(</span><span class="s4">&quot;/register&quot;</span><span class="s2">)</span>
+    <span class="s0">public </span><span class="s1">String register</span><span class="s2">(</span><span class="s1">User user</span><span class="s2">, </span><span class="s1">Model model</span><span class="s2">) {</span>
+        <span class="s1">String result </span><span class="s2">= </span><span class="s1">userService</span><span class="s2">.</span><span class="s1">register</span><span class="s2">(</span><span class="s1">user</span><span class="s2">);</span>
+
+        <span class="s0">if </span><span class="s2">(!</span><span class="s1">result</span><span class="s2">.</span><span class="s1">equals</span><span class="s2">(</span><span class="s4">&quot;SUCCESS&quot;</span><span class="s2">)) {</span>
+            <span class="s1">model</span><span class="s2">.</span><span class="s1">addAttribute</span><span class="s2">(</span><span class="s4">&quot;error&quot;</span><span class="s2">, </span><span class="s1">result</span><span class="s2">);</span>
+            <span class="s0">return </span><span class="s4">&quot;redirect:/register&quot;</span><span class="s2">;</span>
+        <span class="s2">}</span>
+        <span class="s0">return </span><span class="s4">&quot;redirect:/login&quot;</span><span class="s2">;</span>
+    <span class="s2">}</span>
+        <span class="s3">//login page</span>
+
+    <span class="s1">@GetMapping</span><span class="s2">(</span><span class="s4">&quot;/login&quot;</span><span class="s2">)</span>
+    <span class="s0">public </span><span class="s1">String loginPage</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s4">&quot;login&quot;</span><span class="s2">;</span>
+    <span class="s2">}</span>
+        <span class="s1">@PostMapping</span><span class="s2">(</span><span class="s4">&quot;/login&quot;</span><span class="s2">)</span>
+         <span class="s0">public </span><span class="s1">String login</span><span class="s2">(</span><span class="s1">@RequestParam String email</span><span class="s2">,</span>
+        <span class="s1">@RequestParam String password</span><span class="s2">,</span><span class="s1">Model model</span><span class="s2">,</span>
+    <span class="s1">HttpSession session</span><span class="s2">){</span>
+
+        <span class="s1">User user </span><span class="s2">= </span><span class="s1">userService</span><span class="s2">.</span><span class="s1">login</span><span class="s2">(</span><span class="s1">email</span><span class="s2">,</span><span class="s1">password</span><span class="s2">);</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">user </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">) {</span>
+            <span class="s1">session</span><span class="s2">.</span><span class="s1">setAttribute</span><span class="s2">(</span><span class="s4">&quot;loggedUser&quot;</span><span class="s2">, </span><span class="s1">user</span><span class="s2">);</span>
+            <span class="s0">return </span><span class="s4">&quot;redirect:/dashboard&quot;</span><span class="s2">;</span>
+        <span class="s2">}</span>
+        <span class="s1">model</span><span class="s2">.</span><span class="s1">addAttribute</span><span class="s2">(</span><span class="s4">&quot;error&quot;</span><span class="s2">,</span><span class="s4">&quot;Invalid email and password&quot;</span><span class="s2">);</span>
+        <span class="s0">return </span><span class="s4">&quot;login&quot;</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s3">//logout</span>
+
+    <span class="s1">@GetMapping</span><span class="s2">(</span><span class="s4">&quot;/logout&quot;</span><span class="s2">)</span>
+    <span class="s0">public </span><span class="s1">String logout</span><span class="s2">(</span><span class="s1">HttpSession session</span><span class="s2">) {</span>
+
+        <span class="s1">session</span><span class="s2">.</span><span class="s1">invalidate</span><span class="s2">();</span>
+        <span class="s0">return </span><span class="s4">&quot;redirect:/login&quot;</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
