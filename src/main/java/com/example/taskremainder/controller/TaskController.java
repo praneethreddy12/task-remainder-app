@@ -1,7 +1,7 @@
 package com.example.taskremainder.controller;
 
 import com.example.taskremainder.model.Taskmodel;
-import com.example.taskremainder.service.TaskManager;
+import com.example.taskremainder.service.TaskService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,42 +10,42 @@ import java.util.List;
 @RequestMapping("/tasks")
 public class TaskController {
 
-   // private TaskManager service= new TaskManager();
-private final TaskManager service;
+    private final TaskService service;
 
-//constructor injection
-
-    public TaskController(TaskManager service){
+    // constructor injection
+    public TaskController(TaskService service) {
         this.service = service;
     }
-    //add task
 
+    //  ADD TASK
     @PostMapping("/add")
-    public String addTask(@RequestBody Taskmodel taskmodel){
+    public String addTask(@RequestBody Taskmodel taskmodel) {
         service.addTask(taskmodel);
-
         return "Task added successfully";
     }
 
-    //get all task
-
+    //  GET ALL TASKS
     @GetMapping("/show")
-    public List<Taskmodel> getAllTasks(){
+    public List<Taskmodel> getAllTasks() {
         return service.getTasks();
     }
 
-    //update task
+    //  GET TASKS BY USER
+    @GetMapping("/user/{userId}")
+    public List<Taskmodel> getTasksByUser(@PathVariable int userId) {
+        return service.getTasksByUser(userId);
+    }
 
+    //  UPDATE TASK
     @PutMapping("/{id}")
-    public String updateTask(@PathVariable int id, @RequestBody Taskmodel taskmodel){
+    public String updateTask(@PathVariable int id, @RequestBody Taskmodel taskmodel) {
         service.updateTask(id, taskmodel);
         return "Task updated successfully";
     }
 
-    //delete task
-
+    //  DELETE TASK
     @DeleteMapping("/{id}")
-    public String deleteTask(@PathVariable int id){
+    public String deleteTask(@PathVariable int id) {
         service.deleteTask(id);
         return "Task deleted successfully";
     }

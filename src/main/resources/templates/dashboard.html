@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Task Remainder</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Open Sans", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #000000, #434343);
+      padding: 30px;
+      color: #fff;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .header h1 { font-size: 28px; }
+
+    .logout-btn {
+      background: rgba(255, 0, 0, 0.3);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 0, 0, 0.5);
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover { background: rgba(255, 0, 0, 0.5); }
+
+    h3 {
+      text-align: left;
+      margin-bottom: 15px;
+      margin-top: 20px;
+      color: #fff;
+    }
+
+    form {
+      max-width: 800px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 15px;
+      border: none;
+      border-bottom: 2px solid #ccc;
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+    input[type="datetime-local"] { color-scheme: dark; }
+
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #fff;
+    }
+
+    .export-btn {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .export-btn:hover {
+      background: transparent;
+      border: 1px solid #00c6ff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 10px;
+      text-align: left;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    tr:nth-child(even) { background: rgba(255,255,255,0.05); }
+    tr:hover { background: rgba(255,255,255,0.15); }
+
+    .edit-btn {
+      color: #00c6ff;
+      text-decoration: none;
+      margin-right: 8px;
+      font-weight: bold;
+    }
+
+    .delete-btn {
+      color: #ff4d4d;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .edit-btn:hover, .delete-btn:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .header { flex-direction: column; align-items: flex-start; gap: 15px; }
+      form { width: 100%; }
+      table { font-size: 12px; }
+      td, th { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Dashboard</h1>
+  <a href="/logout" class="logout-btn">Logout</a>
+</div>
+
+<form action="/add-task" method="post">
+  <h3>ADD NEW TASK</h3>
+
+  <input type="text" name="title" placeholder="Task Title" required>
+  <input type="text" name="description" placeholder="Task Description" required>
+  <input type="text" name="status" placeholder="pending/completed">
+  <input type="datetime-local" name="dueDate">
+
+  <button type="submit">Add Task</button>
+  <button type="button" class="export-btn" onclick="location.href='/export'">Export CSV</button>
+</form>
+
+<h3>YOUR TASKS</h3>
+
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Status</th>
+    <th>Due Date</th>
+    <th>Actions</th>
+  </tr>
+  <tr th:each="t: ${tasks}">
+    <td th:text="${t.title}"></td>
+    <td th:text="${t.description}"></td>
+    <td th:text="${t.status}"></td>
+    <td th:text="${t.dueDate}"></td>
+    <td>
+      <a th:href="@{'/edit/' + ${t.id}}" class="edit-btn">Edit</a>
+      |
+      <a th:href="@{'/delete/' + ${t.id}}" class="delete-btn" onclick="return confirm('Are you sure?')">Delete</a>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
