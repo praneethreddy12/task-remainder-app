@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 public class AuthController {
 
@@ -47,7 +49,7 @@ public class AuthController {
         return "login";
     }
 
-    //  VERIFY EMAIL
+    // VERIFY EMAIL
     @GetMapping("/verify")
     public String verify(@RequestParam String token, Model model) {
         boolean result = userService.verifyUser(token);
@@ -59,7 +61,7 @@ public class AuthController {
         return "login";
     }
 
-    //  LOGIN
+    // LOGIN
     @GetMapping("/login")
     public String loginPage() {
         return "login";
@@ -80,17 +82,24 @@ public class AuthController {
         }
     }
 
-    //  DASHBOARD
+    // DASHBOARD
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpSession session) {
         UserDTO user = (UserDTO) session.getAttribute("loggedUser");
         if (user == null) return "redirect:/login";
-        model.addAttribute("tasks", taskService.getTasksByUser(user.getId()));
+
+        List<Taskmodel> tasks = taskService.getTasksByUser(user.getId());
+
+        model.addAttribute("tasks", tasks);
         model.addAttribute("user", user);
+        model.addAttribute("totalTasks",     tasks.size());
+        model.addAttribute("pendingCount",   tasks.stream().filter(t -> "pending".equalsIgnoreCase(t.getStatus())).count());
+        model.addAttribute("completedCount", tasks.stream().filter(t -> "completed".equalsIgnoreCase(t.getStatus())).count());
+
         return "dashboard";
     }
 
-    //  ADD TASK
+    // ADD TASK
     @PostMapping("/add-task")
     public String addTask(Taskmodel task, HttpSession session) {
         UserDTO user = (UserDTO) session.getAttribute("loggedUser");
@@ -108,7 +117,7 @@ public class AuthController {
         return "redirect:/dashboard";
     }
 
-    //  EDIT TASK
+    // EDIT TASK
     @GetMapping("/edit/{id}")
     public String editTask(@PathVariable int id, Model model) {
         Taskmodel task = taskService.getTaskById(id);
@@ -123,7 +132,7 @@ public class AuthController {
         return "redirect:/dashboard";
     }
 
-    //  SEND OTP
+    // SEND OTP
     @PostMapping("/send-otp")
     public String sendOtp(@RequestParam String email, Model model) {
         String result = userService.sendOtp(email);
