@@ -3,7 +3,7 @@
 <head>
   <link rel="stylesheet" th:href="@{/css/style.css}" href="/style.css">
   <meta charset="UTF-8">
-  <title>Edit Task - Task Remainder</title>
+  <title>Edit Task - Task Reminder</title>
   <style>
     * {
       margin: 0;
@@ -19,23 +19,64 @@
       justify-content: center;
       min-height: 100vh;
       width: 100%;
-      background: linear-gradient(135deg, #000000, #434343);
+      background: linear-gradient(135deg, #e0f7fa, #b2ebf2, #80deea);
+      padding-top: 60px;
+      padding-bottom: 60px;
+    }
+
+    header {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+    }
+
+    header h1 {
+      color: #006064;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    footer {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.5);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 30px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+    }
+
+    footer p {
+      color: rgba(0, 96, 100, 0.6);
+      font-size: 13px;
     }
 
     form {
-      width: 400px;
-      padding: 35px 30px;
+      width: 420px;
+      padding: 30px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.5);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.8);
       display: flex;
       flex-direction: column;
       align-items: center;
+      box-shadow: 0 4px 24px rgba(0, 188, 212, 0.2);
     }
 
     h2 {
-      color: #fff;
+      color: #006064;
       margin-bottom: 20px;
       text-align: center;
       width: 100%;
@@ -43,8 +84,8 @@
 
     label {
       width: 100%;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 12px;
+      color: rgba(0, 96, 100, 0.6);
+      font-size: 11px;
       margin-top: 14px;
       margin-bottom: 2px;
       text-transform: uppercase;
@@ -59,20 +100,20 @@
       padding: 8px 0;
       border: none;
       outline: none;
-      border-bottom: 2px solid #ccc;
+      border-bottom: 2px solid #80deea;
       background: transparent;
-      color: #fff;
+      color: #004d40;
       font-size: 15px;
       font-family: "Open Sans", sans-serif;
     }
 
     input[type="text"]::placeholder,
     textarea::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(0, 96, 100, 0.4);
     }
 
     input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
+      filter: invert(0.4) sepia(1) saturate(3) hue-rotate(150deg);
       cursor: pointer;
     }
 
@@ -86,8 +127,8 @@
     }
 
     select option {
-      background: #222;
-      color: #fff;
+      background: #e0f7fa;
+      color: #004d40;
     }
 
     .btn-group {
@@ -100,29 +141,30 @@
     button {
       flex: 1;
       padding: 10px;
-      background: #fff;
-      color: #000;
+      background: #0097a7;
+      color: #fff;
       font-weight: 600;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       transition: 0.3s;
       font-family: "Open Sans", sans-serif;
+      font-size: 14px;
     }
 
     button:hover {
       background: transparent;
-      color: #fff;
-      border: 1px solid #fff;
+      color: #0097a7;
+      border: 1px solid #0097a7;
     }
 
     .btn-cancel {
       flex: 1;
       padding: 10px;
       background: transparent;
-      color: #fff;
+      color: #006064;
       font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.4);
+      border: 1px solid rgba(0, 96, 100, 0.35);
       border-radius: 5px;
       cursor: pointer;
       text-align: center;
@@ -135,16 +177,20 @@
     }
 
     .btn-cancel:hover {
-      background: rgba(255,255,255,0.1);
+      background: rgba(0, 150, 167, 0.1);
       text-decoration: none;
     }
   </style>
 </head>
 <body>
 
+<header>
+  <h1>Automatic Task Reminder</h1>
+</header>
+
 <form action="/update-task" method="post">
 
-  <h2>✏️ Edit Task</h2>
+  <h2> Edit Task</h2>
 
   <input type="hidden" name="id"        th:value="${task.id}" />
   <input type="hidden" name="userId"    th:value="${task.userId}" />
@@ -177,6 +223,10 @@
   </div>
 
 </form>
+
+<footer>
+  <p>&copy; 2026 Automatic Task Reminder. All rights reserved.</p>
+</footer>
 
 </body>
 </html>
