@@ -1,7 +1,7 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY . .
-RUN ./mvnw -DskipTests clean install
+RUN chmod +x mvnw && ./mvnw -DskipTests clean install
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
