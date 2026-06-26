@@ -1,8 +1,6 @@
 package com.example.taskremainder.entity;
 
-
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,6 +17,7 @@ public class Task {
     private String description;
 
     private LocalDateTime dueDate;
+
     @Column(nullable = false)
     private String status;
 
@@ -26,16 +25,40 @@ public class Task {
 
     private LocalDateTime createdDate;
 
-    //constructor
-    public  Task() {
-        this.createdDate = LocalDateTime.now();
-        this.status="PENDING";
-    }
-    //CONSTANTS
-    public static final String STATUS_PENDING = "PENDING";
+    private Integer userId;
 
+    public Task() {
+        this.createdDate = LocalDateTime.now();
+        this.status = "PENDING";
+    }
+
+    public static final String STATUS_PENDING = "PENDING";
     public static final String STATUS_COMPLETED = "COMPLETED";
- public  static final String PRIORITY_LOW = "LOW";
-    public  static final String PRIORITY_MEDIUM = "MEDIUM";
-    public  static final String PRIORITY_HIGH = "HIGH";
+    public static final String PRIORITY_LOW = "LOW";
+    public static final String PRIORITY_MEDIUM = "MEDIUM";
+    public static final String PRIORITY_HIGH = "HIGH";
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public LocalDateTime getDueDate() { return dueDate; }
+    public void setDueDate(LocalDateTime dueDate) { this.dueDate = dueDate; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+
+    public LocalDateTime getCreatedDate() { return createdDate; }
+    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
+
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 }
