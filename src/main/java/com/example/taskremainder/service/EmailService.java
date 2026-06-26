@@ -1,49 +1,63 @@
 package com.example.taskremainder.service;
 
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.javamail.JavaMailSender;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${brevo.api.key}")
+    private String apiKey;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    @Value("${app.base.url:https://task-remainder-app-xm3k.onrender.com}")
+    private String baseUrl;
 
-    //  TASK REMINDER
-    public void sendReminderEmail(String toEmail, String taskTitle) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Task Reminder");
-        message.setText("Reminder: Your task '" + taskTitle + "' is due soon.");
-        mailSender.send(message);
-    }
-
-    // VERIFICATION EMAIL
-    public void sendVerificationEmail(String toEmail, String token) {
+    private void sendEmail(String toEmail, String subject, String body) {
         try {
-            String link = "http://localhost:8080/verify?token=" + token;
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(toEmail);
-            message.setSubject("Verify Your Account");
-            message.setText("Click here to verify your account: " + link);
-            mailSender.send(message);
-            System.out.println("Verification email sent to: " + toEmail);
+            String json = String.format("""
+                {
+                    "sender": {"name": "Task Reminder", "email": "b00606001@smtp-brevo.com"},
+                    "to": [{"email": "%s"}],
+                    "subject": "%s",
+                    "textContent": "%s"
+                }
+                """, toEmail, subject, body.replace("\"", "\\\"").replace("\n", "\\n"));
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
+                    .header("accept", "application/json")
+                    .header("api-key", apiKey)
+                    .header("content-type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Brevo response: " + response.statusCode() + " - " + response.body());
         } catch (Exception e) {
-            System.out.println(" EMAIL FAILED: " + e.getMessage());
+            System.out.println("EMAIL FAILED: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // OTP EMAIL
+    public void sendReminderEmail(String toEmail, String taskTitle) {
+        sendEmail(toEmail, "Task Reminder",
+                "Reminder: Your task '" + taskTitle + "' is due soon.");
+    }
+
+    public void sendVerificationEmail(String toEmail, String token) {
+        String link = baseUrl + "/verify?token=" + token;
+        sendEmail(toEmail, "Verify Your Account",
+                "Click here to verify your account: " + link);
+        System.out.println("Verification email sent to: " + toEmail);
+    }
+
     public void sendOtpEmail(String toEmail, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Your Password Reset OTP");
-        message.setText("Your OTP for password reset is: " + otp + "\n\nThis OTP is valid for 10 minutes.");
-        mailSender.send(message);
+        sendEmail(toEmail, "Your Password Reset OTP",
+                "Your OTP for password reset is: " + otp + "\n\nThis OTP is valid for 10 minutes.");
     }
 }
