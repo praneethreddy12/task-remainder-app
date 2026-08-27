@@ -27,6 +27,9 @@ public class Task {
 
     private Integer userId;
 
+    @Column(name = "user_email")
+    private String userEmail;
+
     public Task() {
         this.createdDate = LocalDateTime.now();
         this.status = "PENDING";
@@ -61,4 +64,7 @@ public class Task {
 
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
+
+    public String getUserEmail() { return userEmail; }
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
 }

@@ -18,14 +18,13 @@ public class EmailService {
 
     private void sendEmail(String toEmail, String subject, String body) {
         try {
-            String json = String.format("""
-                {
-                    "sender": {"name": "Task Reminder", "email": "taskremainder001@gmail.com"},
-                    "to": [{"email": "%s"}],
-                    "subject": "%s",
-                    "textContent": "%s"
-                }
-                """, toEmail, subject, body.replace("\"", "\\\"").replace("\n", "\\n"));
+            // Build JSON safely with proper escaping for all values
+            String json = "{" +
+                "\"sender\":{\"name\":\"Task Reminder\",\"email\":\"taskremainder001@gmail.com\"}," +
+                "\"to\":[{\"email\":\"" + escapeJson(toEmail) + "\"}]," +
+                "\"subject\":\"" + escapeJson(subject) + "\"," +
+                "\"textContent\":\"" + escapeJson(body) + "\"" +
+                "}";
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -42,6 +41,15 @@ public class EmailService {
             System.out.println("EMAIL FAILED: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private String escapeJson(String value) {
+        if (value == null) return "";
+        return value.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r")
+                    .replace("\t", "\\t");
     }
 
     public void sendReminderEmail(String toEmail, String taskTitle) {
