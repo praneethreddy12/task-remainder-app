@@ -17,7 +17,6 @@ public class TaskSchedular {
     private final TaskService service;
     private final EmailService emailService;
 
-
     private final Set<Integer> remindedTasks = new HashSet<>();
 
     public TaskSchedular(TaskService service, EmailService emailService) {
@@ -28,42 +27,44 @@ public class TaskSchedular {
     @Scheduled(fixedRate = 60000)
     public void checkTasks() {
         try {
-            System.out.println("Scheduler running... checking tasks for reminders.....");
-
-            List<Taskmodel> tasks = service.getTasks();
             LocalDateTime now = LocalDateTime.now();
+            List<Taskmodel> tasks = service.getTasks();
+            System.out.println("⏰ [Scheduler] Running check at " + now + " (IST). Total tasks in DB: " + tasks.size());
 
             for (Taskmodel task : tasks) {
-
                 // skip if no due date
-                if (task.getDueDate() == null) continue;
+                if (task.getDueDate() == null) {
+                    continue;
+                }
 
                 // skip if already completed
-                if ("COMPLETED".equalsIgnoreCase(task.getStatus())) continue;
+                if ("COMPLETED".equalsIgnoreCase(task.getStatus())) {
+                    continue;
+                }
 
                 // skip if reminder already sent for this task
-                if (remindedTasks.contains(task.getId())) continue;
+                if (remindedTasks.contains(task.getId())) {
+                    continue;
+                }
 
-                // send reminder if due within next 1 hour
-                LocalDateTime oneHourLater = now.plusHours(1);
+                // send reminder if due within the next 1 hour (or due right now / past up to 5 min)
+                LocalDateTime windowStart = now.minusMinutes(5);
+                LocalDateTime windowEnd = now.plusHours(1);
 
-                if (task.getDueDate().isAfter(now) && task.getDueDate().isBefore(oneHourLater)) {
+                if (task.getDueDate().isAfter(windowStart) && task.getDueDate().isBefore(windowEnd)) {
+                    System.out.println("🔔 [Scheduler] Sending reminder for task #" + task.getId() + " '" + task.getTitle() + "' (due: " + task.getDueDate() + ") to: " + task.getUserEmail());
+                    
                     emailService.sendReminderEmail(task.getUserEmail(), task.getTitle());
 
                     // mark this task as reminded so we don't email again
                     remindedTasks.add(task.getId());
-
-                    System.out.println("Reminder sent for task: " + task.getTitle());
-                }
-
-                // clean up: if task is past due, remove from reminded set
-                // so if user resets the task it can be reminded again
-                if (task.getDueDate().isBefore(now)) {
+                } else if (task.getDueDate().isBefore(windowStart)) {
+                    // Task is past due; clean up from reminded set so if edited it can remind again
                     remindedTasks.remove(task.getId());
                 }
             }
         } catch (Exception e) {
-            System.out.println("Scheduler error: " + e.getMessage());
+            System.err.println("❌ [Scheduler] Error during task check: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -29,9 +29,11 @@ public class TaskRepository {
         );
     }
 
-    //  GET ALL TASKS
+    //  GET ALL TASKS (with fallback to user's registered email)
     public List<Taskmodel> getTasks() {
-        String sql = "SELECT * FROM tasks";
+        String sql = "SELECT t.id, t.title, t.description, t.status, t.due_date, t.user_id, " +
+                     "COALESCE(t.user_email, u.email) AS user_email " +
+                     "FROM tasks t LEFT JOIN users u ON t.user_id = u.id";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Taskmodel task = new Taskmodel();
             task.setId(rs.getInt("id"));
@@ -47,7 +49,9 @@ public class TaskRepository {
 
     //  GET TASKS BY USER
     public List<Taskmodel> getTasksByUser(int userId) {
-        String sql = "SELECT * FROM tasks WHERE user_id=?";
+        String sql = "SELECT t.id, t.title, t.description, t.status, t.due_date, t.user_id, " +
+                     "COALESCE(t.user_email, u.email) AS user_email " +
+                     "FROM tasks t LEFT JOIN users u ON t.user_id = u.id WHERE t.user_id=?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Taskmodel task = new Taskmodel();
             task.setId(rs.getInt("id"));
@@ -63,7 +67,9 @@ public class TaskRepository {
 
     //  GET TASK BY ID
     public Taskmodel getTaskById(int id) {
-        String sql = "SELECT * FROM tasks WHERE id=?";
+        String sql = "SELECT t.id, t.title, t.description, t.status, t.due_date, t.user_id, " +
+                     "COALESCE(t.user_email, u.email) AS user_email " +
+                     "FROM tasks t LEFT JOIN users u ON t.user_id = u.id WHERE t.id=?";
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
             Taskmodel task = new Taskmodel();
             task.setId(rs.getInt("id"));
@@ -79,11 +85,13 @@ public class TaskRepository {
 
     //  UPDATE TASK
     public void updateTask(int id, Taskmodel taskmodel) {
-        String sql = "UPDATE tasks SET title=?, description=?, status=? WHERE id=?";
+        String sql = "UPDATE tasks SET title=?, description=?, status=?, due_date=?, user_email=? WHERE id=?";
         jdbcTemplate.update(sql,
                 taskmodel.getTitle(),
                 taskmodel.getDescription(),
                 taskmodel.getStatus(),
+                taskmodel.getDueDate(),
+                taskmodel.getUserEmail(),
                 id
         );
     }

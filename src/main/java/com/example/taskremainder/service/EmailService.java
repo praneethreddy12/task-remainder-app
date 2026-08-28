@@ -16,12 +16,24 @@ public class EmailService {
     @Value("${app.base.url:https://task-remainder-app-xm3k.onrender.com}")
     private String baseUrl;
 
-    private void sendEmail(String toEmail, String subject, String body) {
+    public String sendEmail(String toEmail, String subject, String body) {
+        if (toEmail == null || toEmail.trim().isEmpty()) {
+            String err = "EMAIL SKIPPED: Recipient email is null or empty";
+            System.err.println(err);
+            return err;
+        }
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            String err = "EMAIL SKIPPED: BREVO_API_KEY environment variable is not configured!";
+            System.err.println(err);
+            return err;
+        }
+
         try {
             // Build JSON safely with proper escaping for all values
             String json = "{" +
                 "\"sender\":{\"name\":\"Task Reminder\",\"email\":\"taskremainder001@gmail.com\"}," +
-                "\"to\":[{\"email\":\"" + escapeJson(toEmail) + "\"}]," +
+                "\"to\":[{\"email\":\"" + escapeJson(toEmail.trim()) + "\"}]," +
                 "\"subject\":\"" + escapeJson(subject) + "\"," +
                 "\"textContent\":\"" + escapeJson(body) + "\"" +
                 "}";
@@ -30,16 +42,20 @@ public class EmailService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
                     .header("accept", "application/json")
-                    .header("api-key", apiKey)
+                    .header("api-key", apiKey.trim())
                     .header("content-type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Brevo response: " + response.statusCode() + " - " + response.body());
+            String result = "Brevo response [" + toEmail + "]: status=" + response.statusCode() + " body=" + response.body();
+            System.out.println(result);
+            return result;
         } catch (Exception e) {
-            System.out.println("EMAIL FAILED: " + e.getMessage());
+            String err = "EMAIL FAILED for [" + toEmail + "]: " + e.getMessage();
+            System.err.println(err);
             e.printStackTrace();
+            return err;
         }
     }
 
@@ -53,8 +69,8 @@ public class EmailService {
     }
 
     public void sendReminderEmail(String toEmail, String taskTitle) {
-        sendEmail(toEmail, "Task Reminder",
-                "Reminder: Your task '" + taskTitle + "' is due soon.");
+        sendEmail(toEmail, "Task Reminder: " + taskTitle,
+                "Hello,\n\nThis is a reminder that your task '" + taskTitle + "' is due soon.\n\nPlease check your Task Reminder Dashboard.");
     }
 
     public void sendVerificationEmail(String toEmail, String token) {
@@ -67,5 +83,10 @@ public class EmailService {
     public void sendOtpEmail(String toEmail, String otp) {
         sendEmail(toEmail, "Your Password Reset OTP",
                 "Your OTP for password reset is: " + otp + "\n\nThis OTP is valid for 10 minutes.");
+    }
+
+    public String sendTestEmail(String toEmail) {
+        return sendEmail(toEmail, "Test Email from Task Reminder App",
+                "If you are receiving this, your Brevo email configuration is working perfectly!");
     }
 }
